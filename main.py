@@ -23,6 +23,10 @@ class PrintLines(LineReader):
         else:
             print("[connection_lost] Port closed")
 
+def close_ports():
+    for port_name in system_ports.keys():
+        system_ports[port_name]["port"].close()
+
 
 def handle_ports(event: Event):
     print("[handle_ports] Starting thread")
@@ -32,6 +36,10 @@ def handle_ports(event: Event):
 
         if len(port_names - system_ports.keys()) != 0:
             print("[handle_ports] Ports detected: {}".format(port_names))
+
+        # If this event is set we must terminate the thread
+        if event.is_set():
+            break
 
         for port_name in port_names:
             if not port_name in system_ports:
@@ -49,9 +57,6 @@ def handle_ports(event: Event):
             if system_ports[port_name]["reader"] is None:
                 system_ports[port_name]["reader"] = ReaderThread(system_ports[port_name]["port"], PrintLines)
                 system_ports[port_name]["reader"].start()
-
-        if event.is_set():
-            break
 
         time.sleep(0.5)
 
@@ -72,5 +77,5 @@ if __name__ == '__main__':
         print('Interrupted!')
     finally:
         event.set()
-
-        print("Program terminated")
+        close_ports()
+        print("Script terminated")
