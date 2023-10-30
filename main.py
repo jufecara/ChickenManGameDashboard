@@ -2,8 +2,8 @@ import time
 from utils import get_serial_ports
 from serial import Serial
 from serial.threaded import ReaderThread, LineReader
-from threading import Thread
-from typing import Dict
+from threading import Thread, Event
+
 
 system_ports = {}
 
@@ -17,26 +17,21 @@ class PrintLines(LineReader):
         print("[handle_line] New line: {}".format(line))
 
     def connection_lost(self, exc):
-        print("[connection_lost] Port closed")
-        # print_all(self)
+        if self.transport.serial:
+            print("[connection_lost] Port: [{}] closed".format(self.transport.serial.name))
+            system_ports[self.transport.serial.name] = None
+        else:
+            print("[connection_lost] Port closed")
 
 
-def print_all(obj: object):
-    for attr in dir(obj):
-        print("{}: {}".format(attr, getattr(obj, attr)))
-
-
-def re_open_port(port: Serial) -> bool:
-    if not port.is_open:
-        port.open()
-
-
-def handle_ports():
+def handle_ports(event: Event):
     print("[handle_ports] Starting thread")
 
     while True:
         port_names = get_serial_ports()
-        print("[handle_ports] Ports detected: {}".format(port_names))
+
+        if len(port_names - system_ports.keys()) != 0:
+            print("[handle_ports] Ports detected: {}".format(port_names))
 
         for port_name in port_names:
             if not port_name in system_ports:
@@ -51,28 +46,31 @@ def handle_ports():
             if not system_ports[port_name]["port"].is_open:
                 system_ports[port_name]["port"].open()
 
-
-
             if system_ports[port_name]["reader"] is None:
                 system_ports[port_name]["reader"] = ReaderThread(system_ports[port_name]["port"], PrintLines)
                 system_ports[port_name]["reader"].start()
 
-        time.sleep(1)
+        if event.is_set():
+            break
 
+        time.sleep(0.5)
 
-def handle_loop():
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        print('Interrupted!')
 
 if __name__ == '__main__':
-    thread_ports = Thread(target=handle_ports)
-    thread_loop = Thread(target=handle_loop)
+    try:
+        event = Event()
+        thread_ports = Thread(target=handle_ports, args=(event,))
+        thread_ports.start()
 
-    thread_ports.start()
-    thread_loop.start()
+        while True:
+            pass
 
-    thread_ports.join()
-    thread_loop.join()
+        event.set()
+        thread_ports.join()
+
+    except (KeyboardInterrupt, SystemExit):
+        print('Interrupted!')
+    finally:
+        event.set()
+
+        print("Program terminated")

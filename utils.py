@@ -8,3 +8,8 @@ def get_serial_ports():
         result.append(port)
 
     return result
+
+
+def print_all(obj: object):
+    for attr in dir(obj):
+        print("{}: {}".format(attr, getattr(obj, attr)))
