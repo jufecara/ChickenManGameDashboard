@@ -1,5 +1,6 @@
 from serial import Serial
 from serial.threaded import ReaderThread, LineReader
+
 from utils import get_serial_ports, list_diff
 from parser import get_points, get_mac_address, get_ssid, get_password, get_id, get_channel
 
