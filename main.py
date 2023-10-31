@@ -2,7 +2,6 @@ import time
 from utils import get_serial_ports
 from commands import get_all_points
 from threading import Thread, Event
-from app import App
 from system import SystemPorts
 
 
@@ -19,7 +18,7 @@ def handle_ports(event: Event):
 
 
 def get_points(event: Event):
-    print("[get_points]")
+    print("[get_points] Starting thread")
     while True:
         # If this event is set we must terminate the thread
         if event.is_set():
@@ -42,8 +41,6 @@ if __name__ == '__main__':
         thread_points = Thread(target=get_points, args=(points_event,))
         thread_ports.start()
         thread_points.start()
-
-        app = App()
 
         while True:
             pass

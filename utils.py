@@ -13,3 +13,13 @@ def get_serial_ports():
 def print_all(obj: object):
     for attr in dir(obj):
         print("{}: {}".format(attr, getattr(obj, attr)))
+
+
+def list_diff(list1, list2):
+    diff = []
+
+    for element in list1:
+        if element not in list2:
+            diff.append(element)
+
+    return diff
