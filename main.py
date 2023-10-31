@@ -24,6 +24,9 @@ if __name__ == '__main__':
         while True:
             pass
 
+    except (KeyboardInterrupt, SystemExit):
+        print('Interrupted!')
+    finally:
         ports_event.set()
         points_event.set()
         input_event.set()
@@ -31,13 +34,6 @@ if __name__ == '__main__':
         thread_ports.join()
         thread_points.join()
         thread_input.join()
-
-    except (KeyboardInterrupt, SystemExit):
-        print('Interrupted!')
-    finally:
-        ports_event.set()
-        points_event.set()
-        input_event.set()
 
         SystemPorts.close_all_ports()
 

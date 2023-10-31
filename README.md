@@ -6,6 +6,8 @@ Enter the next command to install the dependencies
 Enter the next command to run
 > pipenv run python3 main.py
 
+> pipenv run python3 -m main
+
 # Use
 Commands
 > `points` to send the points command to the hosts to get the points

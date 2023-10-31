@@ -3,49 +3,54 @@ from serial.threaded import ReaderThread, LineReader
 
 from utils import get_serial_ports, list_diff
 from parser import get_points, get_mac_address, get_ssid, get_password, get_id, get_channel
+from game import Host
+
 
 class PortReader():
     port = None
     reader = None
 
+def line_handler(line: str, hosts):
+    result = get_points(line)
+    if len(result) > 0:
+        id = result[0][0]
+        red = result[0][1]
+        green = result[0][2]
+        blue = result[0][3]
 
-class Host():
-    channel = None
-    id = None
-    mac_address = None
-    ssid = None
-    password = None
+        if not id in hosts:
+            hosts[id] = Host()
 
+            hosts[id].set_points({
+                "red": red,
+                "green": green,
+                "blue": blue
+            })
 
-    def set_id(self, id):
-        self.id = id
+    ids = get_id(line)
+    if len(ids) > 0:
+        id = ids[0]
 
-    def set_channel(self, channel):
-        self.channel = channel
+        if not id in hosts:
+            hosts[id] = Host()
+            hosts[id].set_id(id)
 
-    def set_mac_address(self, mac_address):
-        self.mac_address = mac_address
+            ssid = get_ssid(line)
+            if len(ssid) > 0:
+                hosts[id].set_ssid(ssid[0])
 
-    def set_ssid(self, ssid):
-        self.ssid = ssid
+            password = get_password(line)
+            if len(password) > 0:
+                hosts[id].set_password(password[0])
 
-    def set_password(self, password):
-        self.password = password
+            channel = get_channel(line)
+            if len(channel) > 0:
+                hosts[id].set_channel(channel[0])
 
+            mac_address = get_mac_address(line)
+            if len(mac_address) > 0:
+                hosts[id].set_mac_address(mac_address[0])
 
-class Teams():
-    red = 0
-    green = 0
-    blue = 0
-
-
-class Game():
-    points: Teams = {}
-    hosts: dict[str, Host] = {}
-
-    def __init__(self, points = Teams(), hosts = {}):
-        self.points = points
-        self.hosts = hosts
 
 class PrintLines(LineReader):
     def connection_made(self, transport):
@@ -55,44 +60,7 @@ class PrintLines(LineReader):
     def handle_line(self, line):
         try:
             # print("[handle_line] New line: {}".format(line))
-            points = get_points(line)
-            if len(points) > 0:
-                if SystemPorts._game.points.red == 0 and points[0][0] != 0:
-                    SystemPorts._game.points.red = points[0][0]
-                if SystemPorts._game.points.green == 0 and points[0][1] != 0:
-                    SystemPorts._game.points.green = points[0][1]
-                if SystemPorts._game.points.blue == 0 and points[0][2] != 0:
-                    SystemPorts._game.points.blue = points[0][2]
-                print("score updated: [R: {}, G: {}, B: {}]".format(points[0][0], points[0][1], points[0][2]))
-                print(SystemPorts._game.points.__dict__)
-
-
-
-            ids = get_id(line)
-            if len(ids) > 0:
-                id = ids[0]
-
-                if not id in SystemPorts._game.hosts:
-                    SystemPorts._game.hosts[id] = Host()
-                    SystemPorts._game.hosts[id].set_id(id)
-
-                    ssid = get_ssid(line)
-                    if len(ssid) > 0:
-                        SystemPorts._game.hosts[id].set_ssid(ssid[0])
-
-                    password = get_password(line)
-                    if len(password) > 0:
-                        SystemPorts._game.hosts[id].set_password(password[0])
-
-                    channel = get_channel(line)
-                    if len(channel) > 0:
-                        SystemPorts._game.hosts[id].set_channel(channel[0])
-
-                    mac_address = get_mac_address(line)
-                    if len(mac_address) > 0:
-                        SystemPorts._game.hosts[id].set_mac_address(mac_address[0])
-
-                print(SystemPorts._game.hosts['14'].__dict__)
+            line_handler(line, SystemPorts._hosts)
 
         except Exception as exc:
             print("Exception: {}".format(exc))
@@ -107,7 +75,7 @@ class PrintLines(LineReader):
 
 
 class SystemPorts():
-    _game: Game = {}
+    _hosts: dict[str, Host] = {}
     _ports = {}
     _BAUD_RATE = 115200
 
@@ -116,7 +84,7 @@ class SystemPorts():
 
 
     def init():
-        SystemPorts._game = Game()
+        SystemPorts._host = Host()
         for port_name in get_serial_ports():
             system_port = SystemPorts.get(port_name)
             if not system_port:
