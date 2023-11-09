@@ -2,9 +2,10 @@ import time
 from threading import Event
 from re import findall
 
-from system import SystemPorts
+from system_ports import SystemPorts
 from commands import get_all_points, reset_all
 from parser import get_id
+
 
 def handle_ports(event: Event):
     print("[handle_ports] Starting thread")
@@ -51,10 +52,13 @@ def handle_input(event: Event):
                 get_all_points()
 
             if command.startswith("show"):
-                results = findall(r'^show\s(\d+)$', command)
+                results = findall(r"^show\s(\d+)$", command)
                 id = results[0]
                 if id:
-                    print("[handle_input] details of [{}]: {}".format(id, SystemPorts._hosts[id].__dict__))
-
+                    print(
+                        "[handle_input] details of [{}]: {}".format(
+                            id, SystemPorts._hosts[id].__dict__
+                        )
+                    )
 
             command = None
