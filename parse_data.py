@@ -1,11 +1,12 @@
 import re
 
-points = r'^Chicken\s(\d{1,2})\:\s(\d+)\,(\d+)\,(\d+)$'
-mac_address = r'MAC\-Address\:\s{3}(\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2})'
-ssid = r'SSID:\s{10}(Chicken_(Easy|Medium|Hard)_\d{1,2})\n'
-password = r'Password:\s{6}(.*)\n'
-id = r'Chicken ID:\s{4}([0-9]{2})\n'
-channel = r'Channel:\s{6,7}(\d{1,2})\n'
+points = r"^Chicken\s(\d{1,2})\:\s(\d+)\,(\d+)\,(\d+)$"
+mac_address = r"MAC\-Address\:\s{3}(\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2}\:\d{,2}[ABCDEF]{,2})"
+ssid = r"SSID:\s{10}(Chicken_(Easy|Medium|Hard)_\d{1,2})\n"
+password = r"Password:\s{6}(.*)\n"
+id = r"Chicken ID:\s{4}([0-9]{2})\n"
+channel = r"Channel:\s{6,7}(\d{1,2})\n"
+
 
 def match(text: str, rgex):
     return re.findall(rgex, text)

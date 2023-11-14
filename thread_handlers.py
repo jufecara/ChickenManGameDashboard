@@ -4,7 +4,7 @@ from re import findall
 
 from system_ports import SystemPorts
 from commands import get_all_points, reset_all
-from parser import get_id
+from parse_data import get_id
 
 
 def handle_ports(event: Event):

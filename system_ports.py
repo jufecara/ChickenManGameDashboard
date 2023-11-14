@@ -3,7 +3,7 @@ from serial.threaded import ReaderThread, LineReader
 
 import ws_service
 from utils import get_serial_ports, list_diff
-from parser import (
+from parse_data import (
     get_points,
     get_mac_address,
     get_ssid,
