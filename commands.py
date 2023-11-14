@@ -16,7 +16,7 @@ def get_all_points():
 
 
 def reset_all():
-    cmd = convert("reset -p {}".fotmat(CHICKENS_PWD))
+    cmd = convert("reset -p {}".format(CHICKENS_PWD))
     for port_name in system_ports.SystemPorts.get_ports_names():
         if system_ports.SystemPorts.get_port(port_name):
             system_ports.SystemPorts.get_port(port_name).write(cmd)
