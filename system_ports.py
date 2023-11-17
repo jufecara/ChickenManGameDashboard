@@ -2,15 +2,8 @@ from serial import Serial
 from serial.threaded import ReaderThread, LineReader
 
 import ws_service
-from utils import get_serial_ports, list_diff
-from parse_data import (
-    get_points,
-    get_mac_address,
-    get_ssid,
-    get_password,
-    get_id,
-    get_channel,
-)
+from utils import get_serial_ports
+from parse_data import get_points
 from game import Host
 
 
@@ -33,30 +26,6 @@ def line_handler(line: str, hosts):
             hosts[id] = Host()
 
             hosts[id].set_points({"red": red, "green": green, "blue": blue})
-
-    ids = get_id(line)
-    if len(ids) > 0:
-        id = ids[0]
-
-        if not id in hosts:
-            hosts[id] = Host()
-            hosts[id].set_id(id)
-
-            ssid = get_ssid(line)
-            if len(ssid) > 0:
-                hosts[id].set_ssid(ssid[0])
-
-            password = get_password(line)
-            if len(password) > 0:
-                hosts[id].set_password(password[0])
-
-            channel = get_channel(line)
-            if len(channel) > 0:
-                hosts[id].set_channel(channel[0])
-
-            mac_address = get_mac_address(line)
-            if len(mac_address) > 0:
-                hosts[id].set_mac_address(mac_address[0])
 
 
 class PrintLines(LineReader):

@@ -4,8 +4,7 @@ CHICKENS_PWD = "edfd8e8160383696120dfb444a8b43f1"
 
 
 def convert(command: str):
-    encoded = command.encode("utf-8")
-    return bytearray(encoded)
+    return bytearray(command, "utf-8")
 
 
 def get_all_points():

@@ -1,10 +1,12 @@
 import time
+import os
 from threading import Event
-from re import findall
 
 from system_ports import SystemPorts
 from commands import get_all_points, reset_all
-from parse_data import get_id
+
+SLEEP_TIME_GET_POINTS = float(os.environ.get("SLEEP_TIME_GET_POINTS", 10))
+SLEEP_TIME_SERIAL_PORTS = float(os.environ.get("SLEEP_TIME_SERIAL_PORTS", 0.5))
 
 
 def handle_ports(event: Event):
@@ -17,7 +19,7 @@ def handle_ports(event: Event):
 
         SystemPorts.refresh()
 
-        time.sleep(0.5)
+        time.sleep(SLEEP_TIME_SERIAL_PORTS)
 
 
 def handle_get_points(event: Event):
@@ -30,7 +32,7 @@ def handle_get_points(event: Event):
 
         get_all_points()
 
-        time.sleep(5)
+        time.sleep(SLEEP_TIME_GET_POINTS)
 
 
 def handle_input(event: Event):
@@ -50,15 +52,5 @@ def handle_input(event: Event):
             if command == "points":
                 print("[handle_input] requesting points")
                 get_all_points()
-
-            if command.startswith("show"):
-                results = findall(r"^show\s(\d+)$", command)
-                id = results[0]
-                if id:
-                    print(
-                        "[handle_input] details of [{}]: {}".format(
-                            id, SystemPorts._hosts[id].__dict__
-                        )
-                    )
 
             command = None
